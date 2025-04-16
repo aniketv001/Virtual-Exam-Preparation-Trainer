@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exam Prep Chatbot</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20version%3D%221.1%22%20xmlns%3Axlink%3D%22http%3A//www.w3.org/1999/xlink%22%20xmlns%3Asvgjs%3D%22http%3A//svgjs.dev/svgjs%22%20viewBox%3D%220%200%20700%20700%22%20width%3D%22700%22%20height%3D%22700%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22nnnoise-filter%22%20x%3D%22-20%25%22%20y%3D%22-20%25%22%20width%3D%22140%25%22%20height%3D%22140%25%22%20filterUnits%3D%22objectBoundingBox%22%20primitiveUnits%3D%22userSpaceOnUse%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.102%22%20numOctaves%3D%224%22%20seed%3D%2215%22%20stitchTiles%3D%22stitch%22%20x%3D%220%25%22%20y%3D%220%25%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20result%3D%22turbulence%22/%3E%3CfeSpecularLighting%20surfaceScale%3D%2213%22%20specularConstant%3D%223%22%20specularExponent%3D%2220%22%20lighting-color%3D%22%23417505%22%20x%3D%220%25%22%20y%3D%220%25%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20in%3D%22turbulence%22%20result%3D%22specularLighting%22%3E%3CfeDistantLight%20azimuth%3D%223%22%20elevation%3D%22142%22/%3E%3C/feSpecularLighting%3E%3C/filter%3E%3C/defs%3E%3Crect%20width%3D%22700%22%20height%3D%22700%22%20fill%3D%22%23b8e98632%22/%3E%3Crect%20width%3D%22700%22%20height%3D%22700%22%20fill%3D%22%23417505%22%20filter%3D%22url(%23nnnoise-filter)%22/%3E%3C/svg%3E");
+  padding: 20px;
+  margin: 0;
+}
+
+
+  
+  .container {
+    max-width: 800px;
+    margin: auto;
+    background: #e4f3d6;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1, h2 {
+    text-align: center;
+    color: #333;
+  }
+  
+  input, select, button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  }
+  
+  button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  .form-section {
+    margin-bottom: 40px;
+  }
+  
+  #output {
+    white-space: pre-wrap;
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+.card {
+  background: #f0f8ff;
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+button.loading {
+  position: relative;
+  color: transparent; /* hides the original text */
+}
+
+button.loading::after {
+  content: "⏳ Loading...";
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+button.loading::after {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  border-top: 1px solid #ddd;
+  color: #666;
+  font-size: 0.9rem;
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>📚 Exam Preparation Chatbot</h1>
+
+    <div class="form-section">
+      <h2>📝 Generate Study Plan</h2>
+      <input id="subject" placeholder="Subject" />
+      <input id="exam_date" type="date" />
+      <select id="knowledge_level">
+        <option>Beginner</option>
+        <option>Intermediate</option>
+        <option>Advanced</option>
+      </select>
+      <input id="hours_per_day" type="number" placeholder="Hours per day" />
+      <select id="learning_style">
+        <option>Visual</option>
+        <option>Auditory</option>
+        <option>Reading/Writing</option>
+        <option>Kinesthetic</option>
+        <option>Mixed</option>
+      </select>
+      <button id="planBtn" onclick="generatePlan()">Generate Plan</button>
+    </div>
+
+    <div class="form-section">
+      <h2>📖 Generate Quiz</h2>
+      <input id="quiz_subject" placeholder="Subject" />
+      <input id="quiz_topic" placeholder="Topic" />
+      <select id="quiz_difficulty">
+        <option>Easy</option>
+        <option>Medium</option>
+        <option>Hard</option>
+      </select>
+      <button id="quizBtn" onclick="generateQuiz()">Generate Quiz</button>
+    </div>
+
+    <div class="form-section">
+      <h2>🔍 Get Feedback</h2>
+      <input id="feedback_subject" placeholder="Subject" />
+      <input id="feedback_topic" placeholder="Topic" />
+      <input id="understanding_level" type="number" placeholder="Understanding Level (1-10)" />
+      <button id="feedbackBtn" onclick="getFeedback()">Get Feedback</button>
+    </div>
+
+    <div id="output"></div>
+    <footer>
+      Developed by: Aniket Verma | Registration No: 12319353
+    </footer>
+  </div>
+
+  <script>
+    function scrollToOutput() {
+  const output = document.getElementById("output");
+  output.scrollIntoView({ behavior: "smooth" });
+}
+
+function generatePlan() {
+  const btn = document.getElementById("planBtn");
+  btn.classList.add("loading");
+
+  const data = {
+    subject: document.getElementById("subject").value,
+    exam_date: document.getElementById("exam_date").value,
+    knowledge_level: document.getElementById("knowledge_level").value,
+    hours_per_day: document.getElementById("hours_per_day").value,
+    learning_style: document.getElementById("learning_style").value,
+  };
+
+  fetch("http://localhost:5000/api/generate-study-plan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+    .then(res => res.json())
+    .then(plan => {
+      document.getElementById("output").innerHTML = renderStudyPlan(plan);
+      scrollToOutput();
+    })
+    .finally(() => btn.classList.remove("loading"));
+}
+
+
+function generateQuiz() {
+  const btn = document.getElementById("quizBtn");
+  btn.classList.add("loading");
+
+  const data = {
+    subject: document.getElementById("quiz_subject").value,
+    topic: document.getElementById("quiz_topic").value,
+    difficulty: document.getElementById("quiz_difficulty").value,
+  };
+
+  fetch("http://localhost:5000/api/generate-quiz", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+    .then(res => res.json())
+    .then(quiz => {
+      document.getElementById("output").innerHTML = renderQuiz(quiz);
+      scrollToOutput();
+    })
+    .finally(() => btn.classList.remove("loading"));
+}
+
+
+function getFeedback() {
+  const btn = document.getElementById("feedbackBtn");
+  btn.classList.add("loading");
+
+  const data = {
+    subject: document.getElementById("feedback_subject").value,
+    topic: document.getElementById("feedback_topic").value,
+    understanding_level: document.getElementById("understanding_level").value,
+  };
+
+  fetch("http://localhost:5000/api/get-feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+    .then(res => res.json())
+    .then(feedback => {
+      document.getElementById("output").innerHTML = renderFeedback(feedback);
+      scrollToOutput();
+    })
+    .finally(() => btn.classList.remove("loading"));
+}
+
+
+function renderStudyPlan(plan) {
+  if (plan.raw_response) return `<pre>${plan.raw_response}</pre>`;
+
+  let topics = plan.topics.map(t => `
+    <tr>
+      <td>${t.name}</td>
+      <td>${t.priority}</td>
+      <td>${t.estimated_hours}</td>
+    </tr>
+  `).join("");
+
+  let schedule = plan.daily_schedule.map(d => `
+    <div class="card">
+      <h4>Day ${d.day} (${d.duration} hrs)</h4>
+      <b>Focus Areas:</b> ${Array.isArray(d.focus_areas) ? d.focus_areas.join(", ") : d.focus_areas}<br/>
+      <b>Tasks:</b><ul>${d.tasks.map(t => `<li>${t}</li>`).join("")}</ul>
+    </div>
+  `).join("");
+
+  let resources = plan.resources.map(r => `
+    <tr>
+      <td>${r.name}</td>
+      <td>${r.type}</td>
+      <td><a href="${r.url}" target="_blank">${r.url}</a></td>
+    </tr>
+  `).join("");
+
+  let techniques = plan.techniques.map((t, i) => {
+    if (typeof t === "object") {
+      return `<li><b>${t.name}</b>: ${t.description}</li>`;
+    } else {
+      return `<li>${t}</li>`;
+    }
+  }).join("");
+
+  return `
+    <h2>📌 Key Topics</h2>
+    <table><tr><th>Topic</th><th>Priority</th><th>Hours</th></tr>${topics}</table>
+    
+    <h2>🗓️ Daily Schedule</h2>
+    ${schedule}
+
+    <h2>📚 Resources</h2>
+    <table><tr><th>Name</th><th>Type</th><th>URL</th></tr>${resources}</table>
+
+    <h2>💡 Study Techniques</h2>
+    <ul>${techniques}</ul>
+  `;
+}
+
+function renderQuiz(quiz) {
+  if (quiz.raw_response) return `<pre>${quiz.raw_response}</pre>`;
+
+  return quiz.questions.map((q, i) => `
+    <div class="card">
+      <h4>Q${i + 1}: ${q.question}</h4>
+      <ul>
+        ${q.options.map((opt, j) => `<li><b>${String.fromCharCode(65 + j)}</b>. ${opt}</li>`).join("")}
+      </ul>
+      <p><b>Answer:</b> ${q.correct_answer} — ${q.explanation}</p>
+    </div>
+  `).join("");
+}
+
+function renderFeedback(feedback) {
+  if (feedback.raw_response) return `<pre>${feedback.raw_response}</pre>`;
+
+  let gaps = feedback.potential_gaps.map(g => `<li>${g}</li>`).join("");
+  let resources = feedback.resources.map(r => `
+    <li><b>${r.name}</b> (${r.type}) — ${r.description}
+    ${r.url ? ` [<a href="${r.url}" target="_blank">Link</a>]` : ""}</li>
+  `).join("");
+  let exercises = feedback.exercises.map(e => `<li>${typeof e === "string" ? e : e.description}</li>`).join("");
+
+  return `
+    <h2>🚨 Knowledge Gaps</h2>
+    <ul>${gaps}</ul>
+
+    <h2>🔗 Resources</h2>
+    <ul>${resources}</ul>
+
+    <h2>🧠 Review Strategy</h2>
+    <p>${feedback.review_strategy}</p>
+
+    <h2>📝 Exercises</h2>
+    <ul>${exercises}</ul>
+  `;
+}
+
+  
+  </script>
+</body>
+</html>
